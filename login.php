@@ -10,54 +10,79 @@ if (isset($_SESSION['user'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoTrade - Login / Register</title>
+    <title>EcoTrade — Sign in</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .grid-fade {
+            background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 30%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 30%, transparent 100%);
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-white font-sans antialiased min-h-screen flex items-center justify-center">
-    
-    <div class="w-full max-w-md p-8 bg-gray-800 rounded-2xl shadow-2xl border border-gray-700 relative overflow-hidden">
-        <!-- Decoration -->
-        <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-cyan-500/20 rounded-full blur-3xl"></div>
+<body class="bg-neutral-950 text-neutral-100 font-sans antialiased min-h-screen flex items-center justify-center relative overflow-hidden selection:bg-white selection:text-neutral-950">
 
-        <div class="relative z-10">
-            <div class="text-center mb-8">
-                <a href="index.php" class="inline-flex items-center text-emerald-400 hover:text-emerald-300 mb-4 transition-colors">
-                    <i class="fa-solid fa-arrow-left mr-2"></i> Back to Home
-                </a>
-                <h2 class="text-3xl font-extrabold text-white" id="form-title">Welcome Back</h2>
-                <p class="text-gray-400 mt-2" id="form-subtitle">Sign in to continue to EcoTrade.</p>
+    <div class="absolute inset-0 grid-fade"></div>
+
+    <div class="relative w-full max-w-sm mx-5">
+        <div class="text-center mb-8">
+            <a href="index.php" class="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-300 mb-8 text-sm transition-colors">
+                <i class="fa-solid fa-arrow-left text-xs"></i> Back to home
+            </a>
+            <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center mx-auto mb-5">
+                <i class="fa-solid fa-leaf text-neutral-950"></i>
             </div>
+            <h2 class="text-2xl font-bold tracking-tight" id="form-title">Welcome back</h2>
+            <p class="text-neutral-400 mt-2 text-sm" id="form-subtitle">Sign in to continue to EcoTrade.</p>
+        </div>
 
-            <form id="auth-form" class="space-y-6">
+        <div class="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-7">
+            <form id="auth-form" class="space-y-4">
                 <div>
-                    <label for="username" class="block text-sm font-medium text-gray-300">Username</label>
-                    <input type="text" id="username" required class="mt-1 block w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
+                    <label for="username" class="block text-xs font-medium text-neutral-400 mb-1.5">Username</label>
+                    <input type="text" id="username" required class="block w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition-colors">
                 </div>
 
                 <div id="pincode-group" class="hidden">
-                    <label for="pincode" class="block text-sm font-medium text-gray-300">Pincode (ZIP)</label>
-                    <input type="text" id="pincode" class="mt-1 block w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="e.g. 10001">
-                    <p class="text-xs text-gray-500 mt-1">This ensures you only see local trades.</p>
+                    <label for="pincode" class="block text-xs font-medium text-neutral-400 mb-1.5">Pincode (ZIP)</label>
+                    <input type="text" id="pincode" class="block w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition-colors" placeholder="e.g. 785001">
+                    <p class="text-[11px] text-neutral-600 mt-1.5">This ensures you only see local trades.</p>
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
-                    <input type="password" id="password" required class="mt-1 block w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
+                    <label for="password" class="block text-xs font-medium text-neutral-400 mb-1.5">Password</label>
+                    <input type="password" id="password" required class="block w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-lg text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition-colors">
                 </div>
 
-                <div id="error-msg" class="text-red-400 text-sm hidden bg-red-900/30 p-3 rounded-lg border border-red-900/50"></div>
+                <div id="error-msg" class="text-neutral-300 text-sm hidden bg-neutral-800/60 border border-neutral-700 p-3 rounded-lg flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation text-neutral-400"></i>
+                    <span id="error-text"></span>
+                </div>
 
-                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 focus:ring-offset-gray-900 transition-all shadow-emerald-500/20">
-                    <span id="btn-text">Sign In</span>
+                <button type="submit" class="w-full flex justify-center items-center py-2.5 px-4 rounded-lg text-sm font-semibold text-neutral-950 bg-white hover:bg-neutral-200 transition-colors">
+                    <span id="btn-text">Sign in</span>
                 </button>
             </form>
+        </div>
 
-            <div class="mt-6 text-center text-sm">
-                <span class="text-gray-400" id="toggle-text">Don't have an account?</span>
-                <button type="button" id="toggle-btn" class="font-medium text-emerald-400 hover:text-emerald-300 transition-colors ml-1">Sign up</button>
-            </div>
+        <div class="mt-6 text-center text-sm text-neutral-500">
+            <span id="toggle-text">Don't have an account?</span>
+            <button type="button" id="toggle-btn" class="font-medium text-white hover:text-neutral-300 transition-colors ml-1">Sign up</button>
         </div>
     </div>
 
@@ -73,23 +98,24 @@ if (isset($_SESSION['user'])) {
         const toggleBtn = document.getElementById('toggle-btn');
         const pincodeInput = document.getElementById('pincode');
         const errorMsg = document.getElementById('error-msg');
+        const errorText = document.getElementById('error-text');
         const authForm = document.getElementById('auth-form');
 
         function updateUI() {
             if (isSignup) {
-                formTitle.textContent = 'Create Account';
+                formTitle.textContent = 'Create account';
                 formSubtitle.textContent = 'Join EcoTrade and start trading locally.';
                 pincodeGroup.classList.remove('hidden');
                 pincodeInput.required = true;
-                btnText.textContent = 'Sign Up';
+                btnText.textContent = 'Sign up';
                 toggleText.textContent = 'Already have an account?';
                 toggleBtn.textContent = 'Sign in';
             } else {
-                formTitle.textContent = 'Welcome Back';
+                formTitle.textContent = 'Welcome back';
                 formSubtitle.textContent = 'Sign in to continue to EcoTrade.';
                 pincodeGroup.classList.add('hidden');
                 pincodeInput.required = false;
-                btnText.textContent = 'Sign In';
+                btnText.textContent = 'Sign in';
                 toggleText.textContent = "Don't have an account?";
                 toggleBtn.textContent = 'Sign up';
             }
@@ -104,7 +130,7 @@ if (isset($_SESSION['user'])) {
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             errorMsg.classList.add('hidden');
-            
+
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const pincode = document.getElementById('pincode').value;
@@ -119,17 +145,17 @@ if (isset($_SESSION['user'])) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
+
                 const data = await res.json();
-                
+
                 if (data.success) {
                     window.location.href = 'dashboard.php';
                 } else {
-                    errorMsg.textContent = data.error || 'Authentication failed.';
+                    errorText.textContent = data.error || 'Authentication failed.';
                     errorMsg.classList.remove('hidden');
                 }
             } catch (err) {
-                errorMsg.textContent = 'Network error. Please try again.';
+                errorText.textContent = 'Network error. Please try again.';
                 errorMsg.classList.remove('hidden');
             }
         });
