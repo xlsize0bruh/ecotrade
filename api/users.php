@@ -16,22 +16,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if ($action === 'leaderboard') {
         $users = readJson('users.json');
         
-        $localUsers = array_filter($users, function($u) use ($user) {
+        $localUsers = array_values(array_filter($users, function($u) use ($user) {
             return $u['pincode'] === $user['pincode'];
-        });
+        }));
 
-        // Sort by reputation descending
+        // Sort by reputation (positive minus negative reviews) descending
         usort($localUsers, function($a, $b) {
-            return $b['reputation'] <=> $a['reputation'];
+            $repA = ($a['positive_reviews'] ?? 0) - ($a['negative_reviews'] ?? 0);
+            $repB = ($b['positive_reviews'] ?? 0) - ($b['negative_reviews'] ?? 0);
+            return $repB <=> $repA;
         });
 
         // Get top 10
         $topUsers = array_slice($localUsers, 0, 10);
         
-        // Strip passwords
+        // Strip passwords and expose normalized stats
         foreach ($topUsers as &$u) {
             unset($u['password']);
+            $u['positive_reviews'] = $u['positive_reviews'] ?? 0;
+            $u['negative_reviews'] = $u['negative_reviews'] ?? 0;
         }
+        unset($u);
 
         echo json_encode(['success' => true, 'topUsers' => $topUsers]);
         exit;
