@@ -11,62 +11,82 @@ $user = $_SESSION['user'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoTrade - Dashboard</title>
+    <title>EcoTrade — Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .glass-panel {
-            background: rgba(31, 41, 55, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(75, 85, 99, 0.4);
-        }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        
-        /* Toast animation */
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Subtle scrollbar for main areas */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #404040; }
+
         @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
+            from { transform: translateX(110%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-        .toast-enter { animation: slideInRight 0.3s ease-out forwards; }
-        .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateX(20px); } }
+        .toast-enter { animation: slideInRight 0.25s cubic-bezier(0.16,1,0.3,1) forwards; }
+        .toast-exit { animation: fadeOut 0.25s ease-out forwards; }
+
+        @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .live-dot { animation: pulse-dot 1.6s ease-in-out infinite; }
     </style>
 </head>
-<body class="bg-gray-900 text-white font-sans antialiased h-screen overflow-hidden flex flex-col">
-    
+<body class="bg-neutral-950 text-neutral-100 font-sans antialiased h-screen overflow-hidden flex flex-col selection:bg-white selection:text-neutral-950">
+
     <!-- Toast Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Navbar -->
-    <header class="border-b border-gray-800 bg-gray-900/90 z-20 shrink-0">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header class="border-b border-neutral-900 bg-neutral-950 z-20 shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 w-full">
             <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <i class="fa-solid fa-leaf text-emerald-500 text-2xl mr-2"></i>
-                    <span class="font-bold text-xl tracking-tight text-white hidden sm:block">EcoTrade</span>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <div class="text-sm">
-                        <span class="text-gray-400">Pincode:</span>
-                        <span class="text-emerald-400 font-bold bg-emerald-900/30 px-2 py-1 rounded-md"><?php echo htmlspecialchars($user['pincode']); ?></span>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-white flex items-center justify-center">
+                        <i class="fa-solid fa-leaf text-neutral-950 text-sm"></i>
                     </div>
-                    <div class="h-6 w-px bg-gray-700"></div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center font-bold shadow-lg">
+                    <span class="font-semibold text-[15px] tracking-tight hidden sm:block">EcoTrade</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-1.5 text-xs text-neutral-500">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400/80 live-dot"></span>
+                        Live
+                    </div>
+                    <div class="text-xs text-neutral-400 flex items-center gap-1.5 bg-neutral-900 border border-neutral-800 px-2.5 py-1.5 rounded-lg">
+                        <i class="fa-solid fa-location-dot text-neutral-500 text-[10px]"></i>
+                        <span class="font-medium text-neutral-200"><?php echo htmlspecialchars($user['pincode']); ?></span>
+                    </div>
+                    <div class="flex items-center gap-2.5 pl-1">
+                        <div class="w-8 h-8 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center font-semibold text-sm">
                             <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
                         </div>
-                        <span class="font-medium hidden sm:block"><?php echo htmlspecialchars($user['username']); ?></span>
-                        <div class="text-[10px] font-bold ml-2 bg-gray-800 px-2 py-1 rounded border border-gray-700 hidden sm:flex items-center gap-2">
-                            <span class="text-emerald-400" id="header-pos">0 <i class="fa-solid fa-thumbs-up"></i></span>
-                            <span class="text-red-400" id="header-neg">0 <i class="fa-solid fa-thumbs-down"></i></span>
+                        <div class="hidden sm:block leading-tight">
+                            <div class="font-medium text-sm"><?php echo htmlspecialchars($user['username']); ?></div>
+                            <div class="text-[11px] text-neutral-500 flex items-center gap-2">
+                                <span id="header-pos">0 <i class="fa-solid fa-thumbs-up text-[9px]"></i></span>
+                                <span id="header-neg">0 <i class="fa-solid fa-thumbs-down text-[9px]"></i></span>
+                            </div>
                         </div>
                     </div>
-                    <button id="logout-btn" class="text-gray-400 hover:text-white transition-colors ml-2" title="Logout">
-                        <i class="fa-solid fa-right-from-bracket"></i>
+                    <button id="logout-btn" class="text-neutral-500 hover:text-white hover:bg-neutral-900 w-9 h-9 rounded-lg flex items-center justify-center transition-colors" title="Logout">
+                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
                     </button>
                 </div>
             </div>
@@ -75,108 +95,118 @@ $user = $_SESSION['user'];
 
     <div class="flex-1 flex overflow-hidden">
         <!-- Sidebar -->
-        <aside class="w-20 sm:w-64 border-r border-gray-800 bg-gray-900 flex flex-col shrink-0">
-            <nav class="flex-1 px-2 py-6 space-y-2">
-                <button data-tab="market" class="tab-btn w-full flex items-center px-2 sm:px-4 py-3 text-emerald-400 bg-emerald-900/20 rounded-xl transition-all">
-                    <i class="fa-solid fa-shop text-xl sm:text-lg sm:mr-3 mx-auto sm:mx-0"></i>
-                    <span class="font-medium hidden sm:block">Marketplace</span>
+        <aside class="w-[68px] sm:w-60 border-r border-neutral-900 bg-neutral-950 flex flex-col shrink-0">
+            <nav class="flex-1 px-2 sm:px-3 py-5 space-y-1">
+                <button data-tab="market" class="tab-btn w-full flex items-center px-2 sm:px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-neutral-400 hover:bg-neutral-900 hover:text-neutral-200">
+                    <i class="fa-solid fa-store text-base sm:mr-3 mx-auto sm:mx-0 w-5 text-center"></i>
+                    <span class="hidden sm:block">Marketplace</span>
                 </button>
-                <button data-tab="my-items" class="tab-btn w-full flex items-center px-2 sm:px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-all">
-                    <i class="fa-solid fa-box-open text-xl sm:text-lg sm:mr-3 mx-auto sm:mx-0"></i>
-                    <span class="font-medium hidden sm:block">My Items</span>
+                <button data-tab="my-items" class="tab-btn w-full flex items-center px-2 sm:px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-neutral-400 hover:bg-neutral-900 hover:text-neutral-200">
+                    <i class="fa-solid fa-box text-base sm:mr-3 mx-auto sm:mx-0 w-5 text-center"></i>
+                    <span class="hidden sm:block">My Items</span>
                 </button>
-                <button data-tab="trades" class="tab-btn w-full flex items-center px-2 sm:px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-all">
-                    <i class="fa-solid fa-handshake-angle text-xl sm:text-lg sm:mr-3 mx-auto sm:mx-0"></i>
-                    <span class="font-medium hidden sm:block">My Trades</span>
+                <button data-tab="trades" class="tab-btn w-full flex items-center px-2 sm:px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-neutral-400 hover:bg-neutral-900 hover:text-neutral-200">
+                    <i class="fa-solid fa-arrow-right-arrow-left text-base sm:mr-3 mx-auto sm:mx-0 w-5 text-center"></i>
+                    <span class="hidden sm:block">My Trades</span>
                 </button>
-                <button data-tab="profile" class="tab-btn w-full flex items-center px-2 sm:px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-all mt-4 border border-gray-800">
-                    <i class="fa-solid fa-user text-xl sm:text-lg sm:mr-3 mx-auto sm:mx-0 text-blue-400"></i>
-                    <span class="font-medium hidden sm:block">My Profile</span>
+                <div class="h-px bg-neutral-900 my-3 mx-1"></div>
+                <button data-tab="profile" class="tab-btn w-full flex items-center px-2 sm:px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-neutral-400 hover:bg-neutral-900 hover:text-neutral-200">
+                    <i class="fa-solid fa-user text-base sm:mr-3 mx-auto sm:mx-0 w-5 text-center"></i>
+                    <span class="hidden sm:block">My Profile</span>
                 </button>
-                <button data-tab="champion" class="tab-btn w-full flex items-center px-2 sm:px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-all border border-gray-800 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <i class="fa-solid fa-trophy text-xl sm:text-lg sm:mr-3 mx-auto sm:mx-0 text-yellow-500"></i>
-                    <span class="font-medium hidden sm:block">Eco Champions</span>
+                <button data-tab="champion" class="tab-btn w-full flex items-center px-2 sm:px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-neutral-400 hover:bg-neutral-900 hover:text-neutral-200">
+                    <i class="fa-solid fa-trophy text-base sm:mr-3 mx-auto sm:mx-0 w-5 text-center"></i>
+                    <span class="hidden sm:block">Champions</span>
                 </button>
             </nav>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto bg-gray-950 p-4 sm:p-8 relative">
-            
-            <!-- Marketplace Tab -->
+        <main class="flex-1 overflow-y-auto bg-neutral-950 p-5 sm:p-8 relative">
+
+            <!-- Marketplace -->
             <div id="tab-market" class="tab-content block">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold">Local Market</h2>
-                    <div class="relative">
-                        <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="search-tags" placeholder="Search tags..." class="pl-10 pr-4 py-2 bg-gray-900 border border-gray-700 rounded-full text-sm focus:outline-none focus:border-emerald-500 text-white w-48 sm:w-64 transition-all">
+                <div class="flex justify-between items-center mb-7 gap-4">
+                    <div>
+                        <h2 class="text-xl font-semibold tracking-tight">Local Market</h2>
+                        <p class="text-sm text-neutral-500 mt-0.5">Live items from traders in <?php echo htmlspecialchars($user['pincode']); ?></p>
+                    </div>
+                    <div class="relative shrink-0">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-600 text-xs"></i>
+                        <input type="text" id="search-tags" placeholder="Search items or tags..." class="pl-9 pr-4 py-2.5 bg-neutral-900 border border-neutral-800 rounded-xl text-sm focus:outline-none focus:border-neutral-600 text-white placeholder-neutral-600 w-44 sm:w-72 transition-all">
                     </div>
                 </div>
-                <div id="market-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-20">
-                    <div class="col-span-full text-center py-10 text-gray-500"><i class="fa-solid fa-spinner fa-spin text-3xl"></i></div>
+                <div id="market-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 pb-20">
+                    <div class="col-span-full text-center py-16 text-neutral-600"><i class="fa-solid fa-spinner fa-spin text-2xl"></i></div>
                 </div>
             </div>
 
-            <!-- My Items Tab -->
+            <!-- My Items -->
             <div id="tab-my-items" class="tab-content hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold">My Items</h2>
-                    <button onclick="openItemModal()" class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-emerald-500/20 transition-all">
-                        <i class="fa-solid fa-plus mr-1"></i> Add Item
+                <div class="flex justify-between items-center mb-7">
+                    <div>
+                        <h2 class="text-xl font-semibold tracking-tight">My Items</h2>
+                        <p class="text-sm text-neutral-500 mt-0.5">Items you've listed for trade</p>
+                    </div>
+                    <button onclick="openItemModal()" class="bg-white hover:bg-neutral-200 text-neutral-950 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-plus text-xs"></i> Add Item
                     </button>
                 </div>
-                <div id="my-items-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-20"></div>
+                <div id="my-items-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-20"></div>
             </div>
 
-            <!-- Trades Tab -->
+            <!-- Trades -->
             <div id="tab-trades" class="tab-content hidden">
-                <h2 class="text-2xl font-bold mb-6">Active Trades</h2>
-                <div class="space-y-4" id="trades-list"></div>
+                <h2 class="text-xl font-semibold tracking-tight mb-1">My Trades</h2>
+                <p class="text-sm text-neutral-500 mb-7">Track and manage your active trades</p>
+                <div class="space-y-3" id="trades-list"></div>
             </div>
 
-            <!-- Profile Tab -->
+            <!-- Profile -->
             <div id="tab-profile" class="tab-content hidden">
-                <h2 class="text-2xl font-bold mb-6">My Profile</h2>
-                <div class="glass-panel p-8 rounded-2xl max-w-2xl mx-auto text-center relative overflow-hidden">
-                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
-                    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl"></div>
-                    
-                    <div class="w-24 h-24 bg-gradient-to-tr from-emerald-500 to-cyan-500 rounded-full mx-auto flex items-center justify-center text-4xl font-bold shadow-lg mb-4 relative z-10">
-                        <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
+                <h2 class="text-xl font-semibold tracking-tight mb-7">My Profile</h2>
+                <div class="bg-neutral-900/60 border border-neutral-800 p-8 rounded-2xl max-w-2xl">
+                    <div class="flex items-center gap-5 mb-8">
+                        <div class="w-16 h-16 bg-neutral-800 border border-neutral-700 rounded-2xl flex items-center justify-center text-2xl font-bold">
+                            <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold tracking-tight"><?php echo htmlspecialchars($user['username']); ?></h3>
+                            <p class="text-sm text-neutral-500 flex items-center gap-1.5 mt-1">
+                                <i class="fa-solid fa-location-dot text-[10px]"></i> Pincode <?php echo htmlspecialchars($user['pincode']); ?>
+                            </p>
+                        </div>
                     </div>
-                    <h3 class="text-3xl font-extrabold text-white relative z-10 mb-6"><?php echo htmlspecialchars($user['username']); ?></h3>
-                    
-                    <div class="grid grid-cols-3 gap-4 relative z-10">
-                        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-                            <div class="text-gray-400 text-sm mb-1">Trades Done</div>
-                            <div class="text-2xl font-bold text-emerald-400" id="prof-trades"><i class="fa-solid fa-spinner fa-spin text-sm"></i></div>
+
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-neutral-950 border border-neutral-800 p-4 rounded-xl">
+                            <div class="text-neutral-500 text-xs mb-1.5">Trades done</div>
+                            <div class="text-2xl font-bold" id="prof-trades"><i class="fa-solid fa-spinner fa-spin text-sm text-neutral-600"></i></div>
                         </div>
-                        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-                            <div class="text-gray-400 text-sm mb-1">Positive Feedback</div>
-                            <div class="text-2xl font-bold text-emerald-400" id="prof-pos"><i class="fa-solid fa-spinner fa-spin text-sm"></i></div>
+                        <div class="bg-neutral-950 border border-neutral-800 p-4 rounded-xl">
+                            <div class="text-neutral-500 text-xs mb-1.5">Positive</div>
+                            <div class="text-2xl font-bold flex items-center gap-1.5" id="prof-pos"><i class="fa-solid fa-spinner fa-spin text-sm text-neutral-600"></i></div>
                         </div>
-                        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-                            <div class="text-gray-400 text-sm mb-1">Negative Feedback</div>
-                            <div class="text-2xl font-bold text-red-400" id="prof-neg"><i class="fa-solid fa-spinner fa-spin text-sm"></i></div>
+                        <div class="bg-neutral-950 border border-neutral-800 p-4 rounded-xl">
+                            <div class="text-neutral-500 text-xs mb-1.5">Negative</div>
+                            <div class="text-2xl font-bold text-neutral-500" id="prof-neg"><i class="fa-solid fa-spinner fa-spin text-sm text-neutral-600"></i></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Eco Champion Tab -->
+            <!-- Champions -->
             <div id="tab-champion" class="tab-content hidden">
-                <div class="max-w-3xl mx-auto text-center py-6">
-                    <div class="w-24 h-24 bg-gradient-to-tr from-yellow-400 to-orange-500 rounded-full mx-auto flex items-center justify-center mb-4 shadow-[0_0_50px_rgba(234,179,8,0.2)] border-4 border-gray-900">
-                        <i class="fa-solid fa-crown text-4xl text-white"></i>
+                <div class="max-w-3xl">
+                    <div class="flex items-center gap-3 mb-1">
+                        <i class="fa-solid fa-trophy text-neutral-400"></i>
+                        <h2 class="text-xl font-semibold tracking-tight">Eco Champions</h2>
                     </div>
-                    <h2 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500 mb-2">Eco Champions Leaderboard</h2>
-                    <p class="text-gray-400 mb-8">Top 10 traders in pincode <?php echo htmlspecialchars($user['pincode']); ?>. The #1 user wins a monthly gift!</p>
-                    
-                    <div class="glass-panel p-6 rounded-2xl">
-                        <div id="champion-list" class="space-y-3 text-left">
-                            <div class="animate-pulse"><div class="h-10 bg-gray-800 rounded w-full"></div></div>
-                        </div>
+                    <p class="text-sm text-neutral-500 mb-7">Top traders in pincode <?php echo htmlspecialchars($user['pincode']); ?> — ranked by reputation. The #1 trader wins a monthly gift.</p>
+
+                    <div id="champion-list" class="space-y-2.5">
+                        <div class="h-16 bg-neutral-900/60 border border-neutral-800 rounded-xl animate-pulse"></div>
+                        <div class="h-16 bg-neutral-900/60 border border-neutral-800 rounded-xl animate-pulse"></div>
                     </div>
                 </div>
             </div>
@@ -185,41 +215,41 @@ $user = $_SESSION['user'];
     </div>
 
     <!-- Add/Edit Item Modal -->
-    <div id="add-item-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-gray-800 rounded-2xl w-full max-w-md border border-gray-700 shadow-2xl">
-            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
-                <h3 class="text-xl font-bold" id="item-modal-title">List an Item</h3>
-                <button onclick="closeModal('add-item-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    <div id="add-item-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-neutral-900 rounded-2xl w-full max-w-md border border-neutral-800 shadow-2xl">
+            <div class="px-6 py-5 border-b border-neutral-800 flex justify-between items-center">
+                <h3 class="text-base font-semibold" id="item-modal-title">List an Item</h3>
+                <button onclick="closeModal('add-item-modal')" class="text-neutral-500 hover:text-white w-8 h-8 rounded-lg hover:bg-neutral-800 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6 max-h-[80vh] overflow-y-auto hide-scrollbar">
                 <form id="add-item-form" class="space-y-4">
                     <input type="hidden" id="edit-item-id">
                     <div>
-                        <label class="block text-sm text-gray-400 mb-1">Item Title</label>
-                        <input type="text" id="item-title" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-emerald-500 outline-none">
+                        <label class="block text-xs font-medium text-neutral-400 mb-1.5">Item title</label>
+                        <input type="text" id="item-title" required class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-neutral-600 focus:border-neutral-500 outline-none transition-colors">
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-400 mb-1">Description</label>
-                        <textarea id="item-desc" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-emerald-500 outline-none"></textarea>
+                        <label class="block text-xs font-medium text-neutral-400 mb-1.5">Description</label>
+                        <textarea id="item-desc" rows="3" class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-neutral-600 focus:border-neutral-500 outline-none transition-colors resize-none"></textarea>
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-400 mb-1">Tags (comma separated)</label>
-                        <input type="text" id="item-tags" placeholder="e.g. books, vintage" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-emerald-500 outline-none">
+                        <label class="block text-xs font-medium text-neutral-400 mb-1.5">Tags <span class="text-neutral-600">(comma separated)</span></label>
+                        <input type="text" id="item-tags" placeholder="e.g. books, vintage" class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-neutral-600 focus:border-neutral-500 outline-none transition-colors">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-emerald-400 mb-1"><i class="fa-solid fa-bullseye"></i> Looking For (Tags)</label>
-                        <input type="text" id="item-looking-for" placeholder="e.g. guitar, tools, plant" class="w-full bg-gray-900 border border-emerald-900 rounded-lg px-4 py-2 text-white focus:border-emerald-500 outline-none">
-                        <p class="text-[10px] text-gray-500 mt-1">Specify what you'd like to trade this for. Others can still offer anything.</p>
+                        <label class="block text-xs font-medium text-neutral-300 mb-1.5"><i class="fa-solid fa-bullseye text-[10px] mr-1"></i> Looking for <span class="text-neutral-600">(tags)</span></label>
+                        <input type="text" id="item-looking-for" placeholder="e.g. guitar, tools, plant" class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-neutral-600 focus:border-neutral-500 outline-none transition-colors">
+                        <p class="text-[11px] text-neutral-600 mt-1.5">What you'd like in return. Others can still offer anything.</p>
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-400 mb-1">Image <span id="img-edit-hint" class="text-xs hidden">(Leave blank to keep current)</span></label>
-                        <input type="file" id="item-image" accept="image/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-900/30 file:text-emerald-400 hover:file:bg-emerald-900/50">
+                        <label class="block text-xs font-medium text-neutral-400 mb-1.5">Image <span id="img-edit-hint" class="text-neutral-600 hidden">(leave blank to keep current)</span></label>
+                        <input type="file" id="item-image" accept="image/*" class="w-full text-sm text-neutral-400 file:mr-3 file:py-2 file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-neutral-800 file:text-neutral-200 hover:file:bg-neutral-700 file:cursor-pointer">
                     </div>
-                    <div class="flex gap-2 mt-4">
-                        <button type="button" id="delete-item-btn" class="hidden w-1/3 bg-red-900/50 hover:bg-red-600 text-red-400 hover:text-white py-3 rounded-lg font-bold transition-colors border border-red-900/50">
+                    <div class="flex gap-2 pt-2">
+                        <button type="button" id="delete-item-btn" class="hidden w-1/3 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white py-2.5 rounded-lg text-sm font-medium transition-colors border border-neutral-700">
                             Delete
                         </button>
-                        <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-500 py-3 rounded-lg font-bold flex justify-center items-center">
+                        <button type="submit" class="flex-1 bg-white hover:bg-neutral-200 text-neutral-950 py-2.5 rounded-lg text-sm font-semibold flex justify-center items-center transition-colors">
                             <span id="add-item-btn-text">Post Item</span>
                             <i id="add-item-spinner" class="fa-solid fa-spinner fa-spin hidden ml-2"></i>
                         </button>
@@ -230,75 +260,75 @@ $user = $_SESSION['user'];
     </div>
 
     <!-- Trade Propose Modal -->
-    <div id="propose-trade-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-gray-800 rounded-2xl w-full max-w-md border border-gray-700 shadow-2xl flex flex-col max-h-[90vh]">
-            <div class="p-6 border-b border-gray-700 flex justify-between items-center shrink-0">
-                <h3 class="text-xl font-bold">Propose a Trade</h3>
-                <button onclick="closeModal('propose-trade-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    <div id="propose-trade-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-neutral-900 rounded-2xl w-full max-w-md border border-neutral-800 shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="px-6 py-5 border-b border-neutral-800 flex justify-between items-center shrink-0">
+                <h3 class="text-base font-semibold">Propose a Trade</h3>
+                <button onclick="closeModal('propose-trade-modal')" class="text-neutral-500 hover:text-white w-8 h-8 rounded-lg hover:bg-neutral-800 flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6 overflow-y-auto hide-scrollbar">
-                <p class="text-sm text-gray-400 mb-1">You want: <span id="wanted-item-title" class="text-white font-bold"></span></p>
-                <p class="text-[11px] text-emerald-400 mb-4" id="wanted-looking-for"></p>
-                <p class="text-sm text-gray-400 mb-2">Select an item to offer in return:</p>
+                <p class="text-sm text-neutral-400 mb-1">You want: <span id="wanted-item-title" class="text-white font-semibold"></span></p>
+                <p class="text-[12px] text-neutral-500 mb-5" id="wanted-looking-for"></p>
+                <p class="text-xs font-medium text-neutral-400 mb-2.5">Select an item to offer in return</p>
                 <div id="offer-items-list" class="space-y-2"></div>
                 <input type="hidden" id="wanted-item-id">
             </div>
-            <div class="p-6 border-t border-gray-700 shrink-0">
-                <button id="submit-trade-btn" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed py-3 rounded-lg font-bold">
-                    Send Request
+            <div class="px-6 py-5 border-t border-neutral-800 shrink-0">
+                <button id="submit-trade-btn" disabled class="w-full bg-white hover:bg-neutral-200 text-neutral-950 disabled:opacity-30 disabled:cursor-not-allowed py-2.5 rounded-lg text-sm font-semibold transition-colors">
+                    Send request
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Rating Modal -->
-    <div id="rating-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
-        <div class="bg-gray-800 rounded-2xl w-full max-w-sm border border-emerald-900/50 shadow-2xl text-center p-8">
-            <h3 class="text-2xl font-bold mb-2">Trade Completed!</h3>
-            <p class="text-sm text-gray-400 mb-6">Please rate your experience with this user. This is required.</p>
+    <div id="rating-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-neutral-900 rounded-2xl w-full max-w-sm border border-neutral-800 shadow-2xl text-center p-8">
+            <h3 class="text-lg font-semibold mb-1.5">Trade completed</h3>
+            <p class="text-sm text-neutral-400 mb-7">Rate your experience with this trader. This is required to finalize.</p>
             <input type="hidden" id="rating-trade-id">
-            
-            <div class="grid grid-cols-3 gap-3 mb-6">
-                <button onclick="submitRating(1)" class="p-4 rounded-xl border border-gray-700 bg-gray-900 hover:bg-emerald-900/40 hover:border-emerald-500 transition-all flex flex-col items-center gap-2 group">
-                    <i class="fa-solid fa-thumbs-up text-2xl text-gray-500 group-hover:text-emerald-400 transition-colors"></i>
-                    <span class="text-xs font-bold text-gray-400 group-hover:text-emerald-400">Positive</span>
+
+            <div class="grid grid-cols-3 gap-2.5 mb-6">
+                <button onclick="submitRating(1)" class="p-4 rounded-xl border border-neutral-800 bg-neutral-950 hover:border-white hover:bg-neutral-800 transition-all flex flex-col items-center gap-2 group">
+                    <i class="fa-solid fa-thumbs-up text-xl text-neutral-500 group-hover:text-white transition-colors"></i>
+                    <span class="text-[11px] font-medium text-neutral-400 group-hover:text-white">Positive</span>
                 </button>
-                <button onclick="submitRating(0)" class="p-4 rounded-xl border border-gray-700 bg-gray-900 hover:bg-gray-700 transition-all flex flex-col items-center gap-2 group">
-                    <i class="fa-solid fa-minus text-2xl text-gray-500 group-hover:text-white transition-colors"></i>
-                    <span class="text-xs font-bold text-gray-400 group-hover:text-white">Neutral</span>
+                <button onclick="submitRating(0)" class="p-4 rounded-xl border border-neutral-800 bg-neutral-950 hover:border-neutral-600 hover:bg-neutral-800 transition-all flex flex-col items-center gap-2 group">
+                    <i class="fa-solid fa-minus text-xl text-neutral-500 group-hover:text-neutral-200 transition-colors"></i>
+                    <span class="text-[11px] font-medium text-neutral-400 group-hover:text-neutral-200">Neutral</span>
                 </button>
-                <button onclick="submitRating(-1)" class="p-4 rounded-xl border border-gray-700 bg-gray-900 hover:bg-red-900/40 hover:border-red-500 transition-all flex flex-col items-center gap-2 group">
-                    <i class="fa-solid fa-thumbs-down text-2xl text-gray-500 group-hover:text-red-400 transition-colors"></i>
-                    <span class="text-xs font-bold text-gray-400 group-hover:text-red-400">Negative</span>
+                <button onclick="submitRating(-1)" class="p-4 rounded-xl border border-neutral-800 bg-neutral-950 hover:border-neutral-500 hover:bg-neutral-800 transition-all flex flex-col items-center gap-2 group">
+                    <i class="fa-solid fa-thumbs-down text-xl text-neutral-500 group-hover:text-neutral-300 transition-colors"></i>
+                    <span class="text-[11px] font-medium text-neutral-400 group-hover:text-neutral-300">Negative</span>
                 </button>
             </div>
-            <p class="text-[10px] text-gray-500">Leaving a rating will finalize the trade for both parties.</p>
+            <p class="text-[11px] text-neutral-600">Leaving a rating finalizes the trade for both parties.</p>
         </div>
     </div>
 
-    <!-- Trade Details & Chat Modal -->
-    <div id="trade-chat-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[40] hidden flex justify-end">
-        <div class="bg-gray-900 border-l border-gray-800 w-full sm:w-[450px] h-full flex flex-col shadow-2xl transform translate-x-full transition-transform duration-300" id="chat-panel">
-            <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-800 shrink-0">
+    <!-- Trade Chat Modal -->
+    <div id="trade-chat-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[40] hidden flex justify-end">
+        <div class="bg-neutral-950 border-l border-neutral-800 w-full sm:w-[440px] h-full flex flex-col shadow-2xl transform translate-x-full transition-transform duration-300" id="chat-panel">
+            <div class="px-5 py-4 border-b border-neutral-800 flex justify-between items-center bg-neutral-900 shrink-0">
                 <div>
-                    <h3 class="text-lg font-bold">Trade Chat</h3>
-                    <p class="text-xs text-gray-400" id="chat-status-text">Status</p>
+                    <h3 class="text-base font-semibold">Trade Chat</h3>
+                    <p class="text-xs text-neutral-500" id="chat-status-text">Status</p>
                 </div>
-                <button onclick="closeChat()" class="text-gray-400 hover:text-white bg-gray-700 p-2 rounded-lg"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeChat()" class="text-neutral-500 hover:text-white bg-neutral-800 hover:bg-neutral-700 w-8 h-8 rounded-lg flex items-center justify-center transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
-            <div class="p-4 bg-gray-800/50 border-b border-gray-800 shrink-0 flex justify-between items-center">
-                <div class="text-sm text-gray-300" id="chat-trade-details"></div>
+
+            <div class="px-5 py-3.5 bg-neutral-900/50 border-b border-neutral-800 shrink-0 flex justify-between items-center gap-3">
+                <div class="text-sm text-neutral-300" id="chat-trade-details"></div>
                 <div id="chat-actions"></div>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-4 space-y-4" id="chat-messages"></div>
+            <div class="flex-1 overflow-y-auto p-5 space-y-3" id="chat-messages"></div>
 
-            <div class="p-4 border-t border-gray-800 bg-gray-900 shrink-0">
+            <div class="p-4 border-t border-neutral-800 bg-neutral-950 shrink-0">
                 <form id="chat-form" class="flex gap-2">
                     <input type="hidden" id="chat-trade-id">
-                    <input type="text" id="chat-input" required placeholder="Type a message..." class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-emerald-500 outline-none" autocomplete="off">
-                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 px-4 rounded-lg text-white"><i class="fa-solid fa-paper-plane"></i></button>
+                    <input type="text" id="chat-input" required placeholder="Type a message..." class="flex-1 bg-neutral-900 border border-neutral-800 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-neutral-600 focus:border-neutral-600 outline-none transition-colors" autocomplete="off">
+                    <button type="submit" class="bg-white hover:bg-neutral-200 text-neutral-950 w-10 rounded-lg flex items-center justify-center transition-colors"><i class="fa-solid fa-arrow-up text-sm"></i></button>
                 </form>
             </div>
         </div>
