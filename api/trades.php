@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $trades = readJson('trades.json');
         
-        // Check if either item is locked
+        // Neither item may already be in an active trade.
         foreach($trades as $t) {
             if ($t['status'] !== 'cancelled') {
                 if ($t['offered_item_id'] === $offeredItemId || $t['wanted_item_id'] === $offeredItemId || 
@@ -62,6 +62,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo json_encode(['success' => false, 'error' => 'One of the items is already involved in an active trade.']);
                     exit;
                 }
+            }
+        }
+
+        // The item you OFFER must not be one you've currently lent out or have on loan.
+        // (The item you WANT may be borrowed — you can agree now and trade once it's returned.)
+        $borrows = readJson('borrows.json');
+        foreach($borrows as $b) {
+            if (in_array($b['status'], ['pending', 'accepted']) && $b['item_id'] === $offeredItemId) {
+                echo json_encode(['success' => false, 'error' => 'The item you are offering is tied up in a borrow right now.']);
+                exit;
             }
         }
 
