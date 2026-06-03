@@ -17,13 +17,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $items = readJson('items.json');
         $users = readJson('users.json');
         $trades = readJson('trades.json');
+        $borrows = readJson('borrows.json');
         
-        $lockedItemIds = [];
+        // Items in an active trade are fully unavailable (being given away).
+        $tradeLocked = [];
         foreach($trades as $t) {
-            // In our system, if it's involved in any trade, it's "locked" for new offers
             if ($t['status'] !== 'cancelled') {
-                $lockedItemIds[] = $t['offered_item_id'];
-                $lockedItemIds[] = $t['wanted_item_id'];
+                $tradeLocked[] = $t['offered_item_id'];
+                $tradeLocked[] = $t['wanted_item_id'];
+            }
+        }
+        // Items in a borrow stay visible but can't be borrowed again.
+        // 'accepted' (on loan) takes precedence over 'pending'.
+        $borrowMap = [];
+        foreach($borrows as $b) {
+            if (in_array($b['status'], ['pending', 'accepted'])) {
+                if (!isset($borrowMap[$b['item_id']]) || $b['status'] === 'accepted') {
+                    $borrowMap[$b['item_id']] = [
+                        'status' => $b['status'],
+                        'due' => $b['due_date'] ?? null
+                    ];
+                }
             }
         }
 
@@ -39,9 +53,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     }
                 }
                 
-                $item['owner_pos'] = $owner ? ($owner['positive_reviews'] ?? 0) : 0;
-                $item['owner_neg'] = $owner ? ($owner['negative_reviews'] ?? 0) : 0;
-                $item['is_locked'] = in_array($item['id'], $lockedItemIds);
+                $owner_pos = $owner ? ($owner['positive_reviews'] ?? 0) : 0;
+                $owner_neg = $owner ? ($owner['negative_reviews'] ?? 0) : 0;
+                $inTrade = in_array($item['id'], $tradeLocked);
+                $binfo = $borrowMap[$item['id']] ?? null;
+
+                $item['owner_pos'] = $owner_pos;
+                $item['owner_neg'] = $owner_neg;
+                $item['in_trade'] = $inTrade;
+                $item['borrow_status'] = $binfo ? $binfo['status'] : null; // null | pending | accepted
+                $item['borrow_due'] = $binfo ? $binfo['due'] : null;
+                // Fully unavailable for new offers/borrows (used for "my items" + offer selection)
+                $item['is_locked'] = $inTrade || ($binfo !== null);
                 
                 $localItems[] = $item;
             }
